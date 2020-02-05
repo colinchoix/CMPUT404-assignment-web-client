@@ -93,7 +93,7 @@ class HTTPClient(object):
         self.connect(socket.gethostbyname( host ), port)
 
         # Build the HTTP GET request
-        request = "GET "+path+" HTTP/1.1\r\nHost: "+netlocation+"\r\nConnection: keep-alive\r\nAccept-Charset: utf-8\r\nUser-Agent: python-httpclient\r\nAccept: */*\r\nAccept-Encoding: deflate\r\n\r\n"
+        request = "GET "+path+" HTTP/1.1\r\nHost: "+netlocation+"\r\nAccept-Charset: utf-8\r\nUser-Agent: python-httpclient\r\nAccept: */*\r\nAccept-Encoding: deflate\r\n\r\n"
 
         # Send the request and read the response
         self.sendall(request)
@@ -106,7 +106,7 @@ class HTTPClient(object):
 
         return HTTPResponse(code, body)
 
-    def POST(self, url, args=None):
+    def POST(self, url, args=None, body=""):
         url = urlparse(url)
         # Use / for path if not specified in the url
         host, netlocation, port, path = url.hostname, url.netloc, url.port, "/" if url.path == "" else url.path
@@ -119,17 +119,20 @@ class HTTPClient(object):
         # Check for and POST arguments and build the HTTP POST request
         if args == None:
             length = 0
-            request = "POST "+path+" HTTP/1.1\r\nHost: "+netlocation+"\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: "+str(length)+"\r\nConnection: keep-alive\r\nAccept-Charset: utf-8\r\nUser-Agent: python-httpclient\r\nAccept: */*\r\nAccept-Encoding: deflate\r\n\r\n"
-        else:
+            request = "POST "+path+" HTTP/1.1\r\nHost: "+netlocation+"\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: "+str(length)+"\r\nAccept-Charset: utf-8\r\nUser-Agent: python-httpclient\r\nAccept: */*\r\nAccept-Encoding: deflate\r\n\r\n"
+        elif body == "":
             # Build body of POST request
-            body = ""
             for x in args:
                 body += x + "=" + args[x] + "&"
             # Remove the trailing ampersand
             body = body[:-1]
 
             length = len(body)
-            request = "POST "+path+" HTTP/1.1\r\nHost: "+netlocation+"\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: "+str(length)+"\r\nConnection: keep-alive\r\nAccept-Charset: utf-8\r\nUser-Agent: python-httpclient\r\nAccept: */*\r\nAccept-Encoding: deflate\r\n\r\n"
+            request = "POST "+path+" HTTP/1.1\r\nHost: "+netlocation+"\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: "+str(length)+"\r\nAccept-Charset: utf-8\r\nUser-Agent: python-httpclient\r\nAccept: */*\r\nAccept-Encoding: deflate\r\n\r\n"
+            request += body
+        else:
+            length = len(body)
+            request = "POST "+path+" HTTP/1.1\r\nHost: "+netlocation+"\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: "+str(length)+"\r\nAccept-Charset: utf-8\r\nUser-Agent: python-httpclient\r\nAccept: */*\r\nAccept-Encoding: deflate\r\n\r\n"
             request += body
         
         # Send the request and read the response
@@ -145,7 +148,10 @@ class HTTPClient(object):
 
     def command(self, url, command="GET", args=None):
         if (command == "POST"):
-            return self.POST( url, args )
+            if args != None:
+                return self.POST( url, args, args )
+            else:
+                return self.POST( url, args )
         else:
             return self.GET( url, args )
     

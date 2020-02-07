@@ -127,11 +127,11 @@ class HTTPClient(object):
             # Remove the trailing ampersand
             body = body[:-1]
 
-            length = len(body)
+            length = len(body.encode('utf-8'))
             request = "POST "+path+" HTTP/1.1\r\nHost: "+netlocation+"\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: "+str(length)+"\r\nAccept-Charset: utf-8\r\nUser-Agent: python-httpclient\r\nAccept: */*\r\nAccept-Encoding: deflate\r\n\r\n"
             request += body
         else:
-            length = len(body)
+            length = len(body.encode('utf-8'))
             request = "POST "+path+" HTTP/1.1\r\nHost: "+netlocation+"\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: "+str(length)+"\r\nAccept-Charset: utf-8\r\nUser-Agent: python-httpclient\r\nAccept: */*\r\nAccept-Encoding: deflate\r\n\r\n"
             request += body
         
